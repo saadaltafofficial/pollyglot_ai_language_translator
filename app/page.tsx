@@ -1,101 +1,154 @@
+"use client";
 import Image from "next/image";
+import parrot from "@/public/parrot.png";
+import worldImage from "@/public/worldmap.png";
+import { useState } from "react";
+import { transaltor } from "../src/utils";
+import dotenv from "dotenv";
+import { BeatLoader, CircleLoader } from "react-spinners";
+dotenv.config();
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [text, setText] = useState("");
+  const [language, setLanguage] = useState("");
+  const [translatedMessage, setTranslatedMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleChange = (event: any) => {
+    setText(event.target.value);
+  };
+  const handleLanguage = (event: any) => {
+    setLanguage(event.target.value);
+  };
+
+  const handleSubmit = async (event: any) => {
+    event?.preventDefault()
+    setLoading(true);
+    const message = `Please translate """${text}""" to language """${language}""". I need translation only.`;
+    const response = await transaltor(message);
+    if (!response) {
+      throw Error("Response was not Ok");
+    }
+    if (response.choices[0].message.content) {
+      setLoading(false);
+      setTranslatedMessage(response.choices[0].message.content);
+      setText("")
+      setLanguage("")
+    }
+    if (translatedMessage) {
+      console.log(message);
+      console.log("Translated Message: ", translatedMessage);
+    }
+  };
+
+  return (
+    <section className="h-screen flex md:items-center justify-center">
+      <div className="md:max-w-[500px] mx-auto w-full font-[family-name:var(--font-geist-sans)]">
+        <div className="relative flex items-center gap-4 border py-16 justify-center md:rounded-lg bg-[#0D182E] overflow-hidden">
+          <Image
+            src={worldImage}
+            className="absolute right-0 top-0"
+            width={350}
+            alt="Parrot"
+          />
+          <Image src={parrot} width={120} alt="Parrot" />
+          <div className="relative z-1">
+            <h1 className="font-semibold text-[3rem] text-[#109910]">
+              PollyGlot
+            </h1>
+            <p className="text-white font-light tracking-wide pl-1">
+              Perfect Translation Every Time
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div className="">
+          <div className="border-2 rounded-lg p-6 text-center mx-2 my-4">
+            <form>
+              <h2 className="font-bold text-[#035A9D] text-xl">
+                Text to translate 👇
+              </h2>
+              <textarea
+                name="textToTranslate"
+                id="textToTranslate"
+                onChange={handleChange}
+                placeholder="How are you?"
+                className="bg-gray-100 w-full resize-none h-40 rounded-lg p-2 my-4"
+                required
+              ></textarea>
+              {translatedMessage ? (
+                <div>
+                  <h2 className="font-bold text-[#035A9D] text-xl ">
+                    Your Translation 👇
+                  </h2>
+                  <div className="my-4 gap-2 flex-col justify-center text-left">
+                    <div className="bg-gray-100 w-full resize-none h-40 rounded-lg p-2 my-4">
+                      {translatedMessage}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h2 className="font-bold text-[#035A9D] text-xl ">
+                    Select language 👇
+                  </h2>
+                  <div className="my-4 ml-8 gap-2 flex-col justify-center text-xl">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="option"
+                        value="French"
+                        checked={language === "French"}
+                        onChange={handleLanguage}
+                      />
+                      French
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="option"
+                        value="Spanish"
+                        checked={language === "Spanish"}
+                        onChange={handleLanguage}
+                      />
+                      Spanish
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="option"
+                        value="Japanese"
+                        checked={language === "Japanese"}
+                        onChange={handleLanguage}
+                      />
+                      Japanese
+                    </label>
+                  </div>
+                </div>
+
+              )}
+              {translatedMessage ? (
+                <button
+                onClick={() => setTranslatedMessage("")}
+                  disabled={loading}
+                  className="w-full bg-[#035A9D] hover:bg-[#035a9de3] text-white font-semibold tracking-wide py-3 rounded-lg cursor-pointer"
+                  >
+                  Start Over
+                </button>
+              ) : (
+                <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full bg-[#035A9D] hover:bg-[#035a9de3] text-white font-semibold tracking-wide py-3 rounded-lg cursor-pointer"
+                >
+                  {loading ? (
+                    <BeatLoader size={10} color="white" />
+                  ) : "Translate"}                  
+                </button>
+              )}
+              </form>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
