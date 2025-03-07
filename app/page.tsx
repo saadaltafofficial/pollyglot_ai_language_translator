@@ -29,9 +29,9 @@ export default function Home() {
     if (!response) {
       throw Error("Response was not Ok");
     }
-    if (response.choices[0].message.content) {
+    if (response) {
       setLoading(false);
-      setTranslatedMessage(response.choices[0].message.content);
+      setTranslatedMessage(response);
       setText("")
       setLanguage("")
     }
