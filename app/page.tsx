@@ -10,9 +10,10 @@ dotenv.config();
 
 export default function Home() {
   const [text, setText] = useState("");
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState("French");
   const [translatedMessage, setTranslatedMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (event: any) => {
     setText(event.target.value);
@@ -20,9 +21,14 @@ export default function Home() {
   const handleLanguage = (event: any) => {
     setLanguage(event.target.value);
   };
-
+  
   const handleSubmit = async (event: any) => {
     event?.preventDefault()
+    if (!text || !language) {
+      setError("Please enter text and choose language");
+      throw Error("Please enter text and language");
+    }
+    setError("");
     setLoading(true);
     const message = `Please translate """${text}""" to language """${language}""". I need translation only.`;
     const response = await transaltor(message);
@@ -33,7 +39,6 @@ export default function Home() {
       setLoading(false);
       setTranslatedMessage(response);
       setText("")
-      setLanguage("")
     }
     if (translatedMessage) {
       console.log(message);
@@ -92,6 +97,8 @@ export default function Home() {
                     Select language 👇
                   </h2>
                   <div className="my-4 ml-8 gap-2 flex-col justify-center text-xl">
+                    
+
                     <label className="flex items-center gap-2">
                       <input
                         type="radio"
@@ -99,6 +106,7 @@ export default function Home() {
                         value="French"
                         checked={language === "French"}
                         onChange={handleLanguage}
+                        required
                       />
                       French
                     </label>
@@ -109,6 +117,7 @@ export default function Home() {
                         value="Spanish"
                         checked={language === "Spanish"}
                         onChange={handleLanguage}
+                        required
                       />
                       Spanish
                     </label>
@@ -119,16 +128,23 @@ export default function Home() {
                         value="Japanese"
                         checked={language === "Japanese"}
                         onChange={handleLanguage}
+                        required
                       />
                       Japanese
                     </label>
+                    
                   </div>
                 </div>
 
               )}
+              {error && <p className="text-red-500">{error}</p>}
               {translatedMessage ? (
                 <button
-                onClick={() => setTranslatedMessage("")}
+                onClick={() => {
+                  setTranslatedMessage("")
+                  setError("")
+                  return
+                }}
                   disabled={loading}
                   className="w-full bg-[#035A9D] hover:bg-[#035a9de3] text-white font-semibold tracking-wide py-3 rounded-lg cursor-pointer"
                   >
